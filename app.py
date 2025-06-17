@@ -18,7 +18,13 @@ def list_formats():
     url = request.get_json(force=True).get("url")
     video_id = extract_video_id(url)
     try:
-        ydl_opts = {'quiet': True, 'skip_download': True}
+        ydl_opts = {
+            'quiet': True,
+            'skip_download': True,
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+            }
+        }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(url, download=False)
             formats = []
@@ -63,7 +69,10 @@ def download():
                 'preferredquality': '192',
             }] if is_audio_only else [],
             'quiet': True,
-            'noplaylist': True
+            'noplaylist': True,
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+            }
         }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -97,4 +106,4 @@ def extract_video_id(url):
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run( debug =True,host='0.0.0.0', port=port)
+    app.run(debug = True,host='0.0.0.0', port=port)
