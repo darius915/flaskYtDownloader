@@ -1,0 +1,32 @@
+<form id="downloadForm">
+  <input type="text" id="url" placeholder="Enter YouTube URL" required />
+  <button type="button" onclick="startDownload('video')">Download Video (MP4)</button>
+  <button type="button" onclick="startDownload('audio')">Download Audio (MP3)</button>
+</form>
+
+<div id="progressStatus"></div>
+
+<script>
+function startDownload(mode) {
+  const url = document.getElementById('url').value;
+  fetch('/download', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, mode })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const videoId = data.video_id;
+    const interval = setInterval(() => {
+      fetch(`/progress/${videoId}`)
+        .then(res => res.json())
+        .then(progress => {
+          document.getElementById('progressStatus').innerText = progress.status;
+          if (progress.status === "done" || progress.status === "error") {
+            clearInterval(interval);
+          }
+        });
+    }, 1000);
+  });
+}
+</script>
